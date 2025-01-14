@@ -195,7 +195,7 @@ const deckInit = {
     hasLotusField: true,
 };
 const nantukoTriggers = 1;
-const floatingMana = 4;
+const floatingMana = 2;
 const timesToLoop = 10000;
 let successfulGames = 0;
 console.log('Playing', timesToLoop, 'games, with the following initial conditions');

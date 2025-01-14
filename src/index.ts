@@ -159,6 +159,10 @@ const loop = (game: Game): Game => {
             if (game.Battlefield.cards.some(land => land.cardType === LandType.Legendary)) {
                 game.Graveyard.cards.push(lands[i]);
             } else {
+                // If there's a Crumbling Vestige in the battlefield, we copy that instead and increment mana
+                if (game.Battlefield.cards.some(land => land.cardType === LandType.CrumblingVestige)) {
+                    game.FloatingMana++;
+                }
                 game.Battlefield.cards.push(lands[i]);
             }
         }
@@ -253,7 +257,7 @@ const deckInit: ZoneInit = {
 }
 
 const nantukoTriggers = 1;
-const floatingMana = 4;
+const floatingMana = 2;
 const timesToLoop = 10000;
 let successfulGames = 0;
 
