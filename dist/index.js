@@ -59,9 +59,11 @@ const build = (deckInit, graveyardInit, battlefieldInit, mana, nantukoTriggers) 
         Battlefield,
         NantukoTriggers: nantukoTriggers,
         FloatingMana: mana,
+        MaximumManaGenerated: mana,
     };
 };
 const loop = (game) => {
+    game.MaximumManaGenerated = Math.max(game.MaximumManaGenerated, game.FloatingMana);
     //Pop 4 cards from the deck into the Graveyard
     for (let i = 0; i < 4; i++) {
         //If the deck is empty, break
@@ -116,6 +118,10 @@ const loop = (game) => {
                 game.Graveyard.cards.push(lands[i]);
             }
             else {
+                // If there's a Crumbling Vestige in the battlefield, we copy that instead and increment mana
+                if (game.Battlefield.cards.some(land => land.cardType === LandType.CrumblingVestige)) {
+                    game.FloatingMana++;
+                }
                 game.Battlefield.cards.push(lands[i]);
             }
         }
@@ -196,8 +202,9 @@ const deckInit = {
 };
 const nantukoTriggers = 1;
 const floatingMana = 2;
-const timesToLoop = 10000;
+const timesToLoop = 100000;
 let successfulGames = 0;
+let failedGamesOver5Mana = 0;
 console.log('Playing', timesToLoop, 'games, with the following initial conditions');
 console.log('Deck Init', deckInit);
 console.log('Graveyard Init', graveyardInit);
@@ -207,5 +214,11 @@ for (let i = 0; i < timesToLoop; i++) {
     if (isSuccessful(game)) {
         successfulGames++;
     }
+    else {
+        if (game.MaximumManaGenerated >= 5) {
+            failedGamesOver5Mana++;
+        }
+    }
 }
 console.log('Successful Games', successfulGames, 'out of', timesToLoop);
+console.log('Failed Games with over 5 mana', failedGamesOver5Mana, 'out of', timesToLoop);
