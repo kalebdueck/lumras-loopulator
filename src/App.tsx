@@ -16,7 +16,7 @@ function App() {
           <div>
               <div className="py-5 text-center">
                   <h2>Lumra Loops</h2>
-                  <p className="lead">Calculator to determine odds of lumra looping</p>
+                  <p className="lead">Calculator to determine odds of lumra looping. We're currently assuming a single lotus cobra and a nantuko'd bear. Plenty of room for improvement, hoping to add other non deterministic combos like Altar, Greater Good, Food Chain, Zuran Orb, etc</p>
               </div>
 
               <div className="row">
