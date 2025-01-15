@@ -6,6 +6,8 @@ enum LandType {
     EchoingDeeps,
     CrumblingVestige,
     LotusField,
+    GlacialChasm,
+    FieldOfTheDead
 }
 
 type Card = {
@@ -20,6 +22,8 @@ type ZoneInit = {
     hasEchoingDeeps: boolean;
     hasCrumblingVestige: boolean;
     hasLotusField: boolean;
+    hasGlacialChasm: boolean;
+    hasFieldOfTheDead: boolean;
 }
 
 
@@ -34,6 +38,13 @@ type Game = {
     NantukoTriggers: number,
     FloatingMana: number,
     MaximumManaGenerated: number,
+}
+
+type Results = {
+    totalAttempts: number;
+    successes: number;
+    failedGamesOver5Mana: number;
+    failedGames: Game[];
 }
 
 const shuffle = (deck: Zone): Zone => {
@@ -54,7 +65,9 @@ function buildZone(zoneInit: ZoneInit) {
     const echoingDeepsCount = zoneInit.hasEchoingDeeps ? 1 : 0;
     const crumblingVestigeCount = zoneInit.hasCrumblingVestige ? 1 : 0;
     const lotusFieldCount = zoneInit.hasLotusField ? 1 : 0;
-    const basicLandCount = zoneInit.landCount - (legendaryCount + vesuvaCount + echoingDeepsCount + crumblingVestigeCount + lotusFieldCount);
+    const glacialChasmCount = zoneInit.hasGlacialChasm ? 1 : 0;
+    const fieldOfTheDeadCount = zoneInit.hasFieldOfTheDead ? 1 : 0;
+    const basicLandCount = zoneInit.landCount - (legendaryCount + vesuvaCount + echoingDeepsCount + crumblingVestigeCount + lotusFieldCount + glacialChasmCount + fieldOfTheDeadCount);
 
     for (let j = 0; j < nonLandCount; j++) {
         deck.cards.push({cardType: LandType.NonLand});
@@ -76,6 +89,14 @@ function buildZone(zoneInit: ZoneInit) {
     }
     for (let j = 0; j < lotusFieldCount; j++) {
         deck.cards.push({cardType: LandType.LotusField});
+    }
+
+    for (let j = 0; j < glacialChasmCount; j++) {
+        deck.cards.push({cardType: LandType.GlacialChasm});
+    }
+
+    for (let j = 0; j < fieldOfTheDeadCount; j++) {
+        deck.cards.push({cardType: LandType.FieldOfTheDead});
     }
 
     shuffle(deck);
@@ -139,6 +160,7 @@ const loop = (game: Game): Game => {
     for (let i = 0; i < lands.length; i++) {
         // If the lands are echoing deeps, and another land in the holding area is legendary, put it back into the graveyard
         // If another land in the holding area is vesuva and there's a legendary land in the battlefield, put it into the graveyard
+        // If another land in the holding area is crumbling vestige, copy that and increment mana
         // otherwise put it into the battlefield
         if (lands[i].cardType === LandType.EchoingDeeps) {
             if (lands.some(land => land.cardType === LandType.Legendary)) {
@@ -146,6 +168,8 @@ const loop = (game: Game): Game => {
             } else {
                 if (lands.some(land => land.cardType === LandType.Vesuva) && game.Battlefield.cards.some(land => land.cardType === LandType.Legendary)) {
                     game.Graveyard.cards.push(lands[i]);
+                } else if (lands.some(land => land.cardType === LandType.CrumblingVestige)) {
+                    game.FloatingMana++;
                 } else {
                     game.Battlefield.cards.push(lands[i]);
                 }
@@ -175,6 +199,11 @@ const loop = (game: Game): Game => {
         if (lands[i].cardType === LandType.CrumblingVestige) {
             game.Battlefield.cards.push(lands[i]);
             game.FloatingMana++;
+        }
+
+        // If the land is a glacial chasm, put it into the graveyard
+        if (lands[i].cardType === LandType.GlacialChasm) {
+            game.Graveyard.cards.push(lands[i]);
         }
 
         // If the land is lotus field, put into the graveyard and pop 1 land from the battlefield into the graveyard
@@ -231,6 +260,7 @@ const isSuccessful = (game: Game): boolean => {
 
 
 //Lets start with a simple game
+/**
 const battlefieldInit: ZoneInit = {
     count: 3,
     landCount: 3,
@@ -259,24 +289,31 @@ const deckInit: ZoneInit = {
     hasCrumblingVestige: true,
     hasLotusField: true,
 }
+    **/
 
 
-const simulate = (deckInit: ZoneInit, graveyardInit: ZoneInit, battlefieldInit: ZoneInit, floatingMana: number, nantukoTriggers: number, timesToLoop: number): [number, number] => {
-    let successfulGames = 0;
-    let failedGamesOver5Mana = 0;
+const simulate = (deckInit: ZoneInit, graveyardInit: ZoneInit, battlefieldInit: ZoneInit, floatingMana: number, nantukoTriggers: number, timesToLoop: number): Results => {
+
+    let results: Results = {
+        totalAttempts: timesToLoop,
+        successes: 0,
+        failedGamesOver5Mana: 0,
+        failedGames: [],
+    }
 
     for (let i = 0; i < timesToLoop; i++) {
         const game = play(build(deckInit, graveyardInit, battlefieldInit, floatingMana, nantukoTriggers));
         if (isSuccessful(game)) {
-            successfulGames++;
+            results.successes++;
         } else {
+            results.failedGames.push(game);
             if (game.MaximumManaGenerated >= 5) {
-                failedGamesOver5Mana++;
+                results.failedGamesOver5Mana++;
             }
         }
     }
 
-    return [successfulGames, failedGamesOver5Mana];
+    return results;
 }
 
 /**
@@ -308,4 +345,4 @@ console.log('Failed Games with over 5 mana', failedGamesOver5Mana, 'out of', tim
 
  **/
 
-export {simulate}; export type {ZoneInit, Zone, Game, Card};
+export {simulate}; export type {ZoneInit, Zone, Game, Card, Results};
