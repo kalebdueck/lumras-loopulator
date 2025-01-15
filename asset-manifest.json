@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/lumras-loopulator/static/css/main.42dd1359.css",
-    "main.js": "/lumras-loopulator/static/js/main.6eb07a83.js",
+    "main.js": "/lumras-loopulator/static/js/main.6d437feb.js",
     "static/js/453.92d9a728.chunk.js": "/lumras-loopulator/static/js/453.92d9a728.chunk.js",
     "index.html": "/lumras-loopulator/index.html",
     "main.42dd1359.css.map": "/lumras-loopulator/static/css/main.42dd1359.css.map",
-    "main.6eb07a83.js.map": "/lumras-loopulator/static/js/main.6eb07a83.js.map",
+    "main.6d437feb.js.map": "/lumras-loopulator/static/js/main.6d437feb.js.map",
     "453.92d9a728.chunk.js.map": "/lumras-loopulator/static/js/453.92d9a728.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.42dd1359.css",
-    "static/js/main.6eb07a83.js"
+    "static/js/main.6d437feb.js"
   ]
 }
