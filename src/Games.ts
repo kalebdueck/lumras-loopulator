@@ -26,12 +26,21 @@ type ZoneInit = {
     hasFieldOfTheDead: boolean;
 }
 
+enum LoopType {
+    Nantuko,
+    Altar,
+    FoodChain,
+    ZuranOrb,
+    GreaterGood,
+}
+
 
 type Zone = {
     cards: Card[];
 }
 
 type Game = {
+    LoopType: LoopType;
     Deck: Zone,
     Graveyard: Zone,
     Battlefield: Zone,
@@ -104,7 +113,7 @@ function buildZone(zoneInit: ZoneInit) {
     return deck;
 }
 
-const build = (deckInit: ZoneInit, graveyardInit: ZoneInit, battlefieldInit: ZoneInit, mana: number, nantukoTriggers: number): Game => {
+const build = (loopType: LoopType, deckInit: ZoneInit, graveyardInit: ZoneInit, battlefieldInit: ZoneInit, mana: number, nantukoTriggers: number): Game => {
 
     const Deck = buildZone(deckInit);
 
@@ -113,6 +122,7 @@ const build = (deckInit: ZoneInit, graveyardInit: ZoneInit, battlefieldInit: Zon
     const Battlefield = buildZone(battlefieldInit);
 
     return {
+        LoopType: loopType,
         Deck,
         Graveyard,
         Battlefield,
@@ -225,7 +235,7 @@ const loop = (game: Game): Game => {
 }
 
 const play = (game: Game): Game => {
-    let loopCount = 0;
+    //let loopCount = 0;
     while (game.Deck.cards.length > 0) {
         /*
         console.log('Looping with', [
@@ -235,7 +245,7 @@ const play = (game: Game): Game => {
             'Floating Mana', game.FloatingMana,
         ]);
         */
-        loopCount++;
+        //loopCount++;
         if (game.NantukoTriggers < 1 || game.FloatingMana < 2) {
             //console.log('Game Over');
             break;
@@ -301,8 +311,9 @@ const simulate = (deckInit: ZoneInit, graveyardInit: ZoneInit, battlefieldInit: 
         failedGames: [],
     }
 
+    const loopType = LoopType.Nantuko;
     for (let i = 0; i < timesToLoop; i++) {
-        const game = play(build(deckInit, graveyardInit, battlefieldInit, floatingMana, nantukoTriggers));
+        const game = play(build(loopType, deckInit, graveyardInit, battlefieldInit, floatingMana, nantukoTriggers));
         if (isSuccessful(game)) {
             results.successes++;
         } else {
